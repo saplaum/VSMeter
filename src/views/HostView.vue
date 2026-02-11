@@ -79,10 +79,23 @@
 
           <!-- Reset Button -->
           <div class="text-center">
-            <button @click="handleReset" class="btn-secondary">
-              Reset Voting
+            <button @click="handleReset" class="btn-primary bg-red-600 hover:bg-red-700">
+              🔄 Reset Voting & Start New Round
             </button>
+            <p class="text-vs-text-muted text-sm mt-2">
+              This will clear all votes and start a new voting session
+            </p>
           </div>
+        </div>
+
+        <!-- Reset Button During Active Voting -->
+        <div v-else-if="isActive || voteCount > 0" class="text-center">
+          <button 
+            @click="handleReset" 
+            class="text-vs-text-muted hover:text-red-400 text-sm transition-colors"
+          >
+            Reset Voting
+          </button>
         </div>
 
         <!-- Waiting State -->
@@ -194,8 +207,10 @@ const voteUrl = computed(() => {
 });
 
 const handleReset = () => {
-  resultsRevealed.value = false;
-  resetTimer();
-  reset();
+  if (confirm('Are you sure you want to reset the voting? All current votes will be lost.')) {
+    resultsRevealed.value = false;
+    resetTimer();
+    reset();
+  }
 };
 </script>
