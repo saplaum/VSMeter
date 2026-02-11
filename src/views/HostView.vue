@@ -101,82 +101,83 @@
         </header>
 
         <div class="space-y-6">
-        <!-- Share Link -->
-        <ShareLink :url="voteUrl" />
+          <!-- Share Link -->
+          <ShareLink :url="voteUrl" />
 
-        <!-- Stats Card -->
-        <div class="card">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-semibold mb-2">Participants</h3>
-              <p class="text-3xl font-bold text-vs-bar-accent">
-                {{ voteCount }} of {{ participantCount }}
-              </p>
-              <p class="text-vs-text-muted text-sm mt-1">have voted</p>
+          <!-- Stats Card -->
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-semibold mb-2">Participants</h3>
+                <p class="text-3xl font-bold text-vs-bar-accent">
+                  {{ voteCount }} of {{ participantCount }}
+                </p>
+                <p class="text-vs-text-muted text-sm mt-1">have voted</p>
+              </div>
+              
+              <!-- Timer -->
+              <div v-if="isActive && !resultsRevealed">
+                <Timer :seconds="timeRemaining" message="until results visible" />
+              </div>
+              
+              <!-- Start Button -->
+              <div v-else-if="!isActive && !resultsRevealed" class="text-center">
+                <button 
+                  @click="handleStartVoting" 
+                  class="btn-primary"
+                  :disabled="participantCount === 0"
+                >
+                  Start Voting
+                </button>
+                <p class="text-vs-text-muted text-sm mt-2">
+                  {{ participantCount === 0 ? 'Waiting for participants...' : `${participantCount} participants connected` }}
+                </p>
+              </div>
             </div>
-            
-            <!-- Timer -->
-            <div v-if="isActive && !resultsRevealed">
-              <Timer :seconds="timeRemaining" message="until results visible" />
+          </div>
+
+          <!-- Results -->
+          <div v-if="resultsRevealed" class="space-y-6">
+            <div class="card">
+              <h2 class="text-2xl font-bold mb-6 text-center">Results</h2>
+              <ResultChart
+                :options="config.options"
+                :results="results"
+                :totalVotes="voteCount"
+              />
             </div>
-            
-            <!-- Start Button -->
-            <div v-else-if="!isActive && !resultsRevealed" class="text-center">
-              <button 
-                @click="handleStartVoting" 
-                class="btn-primary"
-                :disabled="participantCount === 0"
-              >
-                Start Voting
+
+            <!-- Reset Button -->
+            <div class="text-center">
+              <button @click="handleReset" class="btn-primary bg-red-600 hover:bg-red-700">
+                🔄 Reset Voting & Start New Round
               </button>
               <p class="text-vs-text-muted text-sm mt-2">
-                {{ participantCount === 0 ? 'Waiting for participants...' : `${participantCount} participants connected` }}
+                This will clear all votes and start a new voting session
               </p>
             </div>
           </div>
-        </div>
 
-        <!-- Results -->
-        <div v-if="resultsRevealed" class="space-y-6">
-          <div class="card">
-            <h2 class="text-2xl font-bold mb-6 text-center">Results</h2>
-            <ResultChart
-              :options="config.options"
-              :results="results"
-              :totalVotes="voteCount"
-            />
+          <!-- Reset Button During Active Voting -->
+          <div v-else-if="isActive || voteCount > 0" class="text-center">
+            <button 
+              @click="handleReset" 
+              class="text-vs-text-muted hover:text-red-400 text-sm transition-colors"
+            >
+              Reset Voting
+            </button>
           </div>
 
-          <!-- Reset Button -->
-          <div class="text-center">
-            <button @click="handleReset" class="btn-primary bg-red-600 hover:bg-red-700">
-              🔄 Reset Voting & Start New Round
-            </button>
-            <p class="text-vs-text-muted text-sm mt-2">
-              This will clear all votes and start a new voting session
+          <!-- Waiting State -->
+          <div v-else class="card text-center py-12">
+            <div class="text-6xl mb-4">⏳</div>
+            <p class="text-xl text-vs-text-muted">
+              Waiting for participants...
+            </p>
+            <p class="text-sm text-vs-text-muted mt-2">
+              Timer starts automatically with first vote or manually
             </p>
           </div>
-        </div>
-
-        <!-- Reset Button During Active Voting -->
-        <div v-else-if="isActive || voteCount > 0" class="text-center">
-          <button 
-            @click="handleReset" 
-            class="text-vs-text-muted hover:text-red-400 text-sm transition-colors"
-          >
-            Reset Voting
-          </button>
-        </div>
-
-        <!-- Waiting State -->
-        <div v-else class="card text-center py-12">
-          <div class="text-6xl mb-4">⏳</div>
-          <p class="text-xl text-vs-text-muted">
-            Waiting for participants...
-          </p>
-          <p class="text-sm text-vs-text-muted mt-2">
-            Timer starts automatically with first vote or manually
-          </p>
         </div>
       </div>
     </div>
