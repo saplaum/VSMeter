@@ -136,7 +136,9 @@ onMounted(async () => {
   }
 });
 
-// WebRTC Participant
+// WebRTC Participant - use full room ID with votingId prefix
+const fullRoomId = `${props.votingId}-${props.roomId}`;
+
 const {
   connectionStatus,
   myVote,
@@ -147,7 +149,7 @@ const {
   timerActive,
   connect,
   vote,
-} = useWebRTCParticipant(props.roomId);
+} = useWebRTCParticipant(fullRoomId);
 
 const handleVote = (optionLabel) => {
   vote(optionLabel);

@@ -287,7 +287,7 @@ const {
   broadcastTimer,
   broadcastTimerStart,
   reset,
-} = useWebRTCHost(computed(() => config.value));
+} = useWebRTCHost(computed(() => config.value), null, props.votingId);
 
 // Timer
 const delaySeconds = computed(() => config.value?.delaySeconds || 30);

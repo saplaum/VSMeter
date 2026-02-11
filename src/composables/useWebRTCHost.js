@@ -3,9 +3,10 @@ import Peer from 'peerjs';
 import { generateRoomId } from '../utils/roomId';
 import { MESSAGE_TYPES, CONNECTION_STATUS } from '../utils/constants';
 
-export function useWebRTCHost(votingConfig, customRoomId = null) {
+export function useWebRTCHost(votingConfig, customRoomId = null, votingId = null) {
   const peer = ref(null);
   const roomId = ref(customRoomId || generateRoomId());
+  const fullRoomId = computed(() => votingId ? `${votingId}-${roomId.value}` : roomId.value);
   const connectionStatus = ref(CONNECTION_STATUS.DISCONNECTED);
   
   // Store peer connections
@@ -50,7 +51,8 @@ export function useWebRTCHost(votingConfig, customRoomId = null) {
         
         connectionStatus.value = CONNECTION_STATUS.CONNECTING;
         
-        peer.value = new Peer(roomId.value, {
+        // Use fullRoomId (with votingId prefix) for PeerJS
+        peer.value = new Peer(fullRoomId.value, {
           debug: 2,
         });
 
