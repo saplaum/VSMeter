@@ -23,7 +23,10 @@ export function useWebRTCHost(votingConfig) {
     const resultObj = {};
     
     // Initialize all options with 0
-    votingConfig.options.forEach(option => {
+    const config = votingConfig.value;
+    if (!config || !config.options) return resultObj;
+    
+    config.options.forEach(option => {
       resultObj[option.label] = 0;
     });
     
@@ -114,6 +117,32 @@ export function useWebRTCHost(votingConfig) {
     });
   };
 
+  const broadcastTimer = (timeRemaining, isActive) => {
+    const message = {
+      type: MESSAGE_TYPES.TIMER_UPDATE,
+      timeRemaining,
+      isActive,
+    };
+
+    peers.value.forEach(conn => {
+      if (conn.open) {
+        conn.send(message);
+      }
+    });
+  };
+
+  const broadcastTimerStart = () => {
+    const message = {
+      type: MESSAGE_TYPES.TIMER_START,
+    };
+
+    peers.value.forEach(conn => {
+      if (conn.open) {
+        conn.send(message);
+      }
+    });
+  };
+
   const sendStateToPeer = (peerId) => {
     const conn = peers.value.get(peerId);
     if (conn && conn.open) {
@@ -182,6 +211,8 @@ export function useWebRTCHost(votingConfig) {
     initHost,
     broadcastResults,
     broadcastState,
+    broadcastTimer,
+    broadcastTimerStart,
     reset,
     destroy,
   };

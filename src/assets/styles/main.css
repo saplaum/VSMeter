@@ -19,10 +19,11 @@
   
   /* Voting Option Button */
   .voting-option {
-    @apply flex flex-col items-center gap-4 p-8 
+    @apply flex flex-col items-center gap-3 p-6 
            bg-vs-dark-light border-2 border-vs-border 
            rounded-xl hover:border-vs-bar-accent 
-           transition-all duration-200 cursor-pointer;
+           transition-all duration-200 cursor-pointer
+           min-w-[140px] flex-shrink-0;
   }
   
   .voting-option.selected {

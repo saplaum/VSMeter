@@ -1,37 +1,43 @@
 <template>
   <div class="results-container py-8">
-    <div
-      v-for="(option, index) in sortedOptions"
-      :key="option.label"
-      class="result-item mb-8"
-    >
-      <!-- Percentage Label -->
-      <div class="text-4xl font-bold text-center mb-3">
-        {{ getPercentage(option.label) }}%
-      </div>
-      
-      <!-- Bar Container -->
-      <div class="relative h-32 bg-vs-dark-light rounded-xl overflow-hidden border border-vs-border">
-        <div
-          class="bar-gradient h-full rounded-xl result-bar transition-all duration-1000"
-          :style="{ 
-            width: getPercentage(option.label) + '%',
-            animationDelay: (index * 0.1) + 's'
-          }"
-        ></div>
-      </div>
-      
-      <!-- Option Label -->
-      <div class="text-center mt-3">
-        <span class="text-2xl">{{ option.emoji }}</span>
-        <span class="text-lg text-vs-text-muted ml-2">{{ option.label }}</span>
-        <span v-if="myVote === option.label" class="ml-2 text-vs-bar-accent">✓</span>
+    <div class="flex justify-center items-end gap-6 md:gap-8">
+      <div
+        v-for="(option, index) in sortedOptions"
+        :key="option.label"
+        class="result-item flex flex-col items-center"
+      >
+        <!-- My Vote Indicator (above percentage) -->
+        <div class="h-8 flex items-center justify-center mb-1">
+          <div v-if="myVote === option.label" class="text-vs-bar-accent text-2xl">✓</div>
+        </div>
+        
+        <!-- Percentage Label -->
+        <div class="text-3xl font-bold text-center mb-3">
+          {{ getPercentage(option.label) }}%
+        </div>
+        
+        <!-- Bar Container (Vertical) -->
+        <div class="relative w-16 md:w-20 h-64 bg-vs-dark-light rounded-xl overflow-hidden border border-vs-border flex items-end">
+          <div
+            class="bar-gradient w-full rounded-xl result-bar"
+            :style="{ 
+              height: getPercentage(option.label) + '%',
+              animationDelay: (index * 0.1) + 's'
+            }"
+          ></div>
+        </div>
+        
+        <!-- Option Label -->
+        <div class="text-center mt-4">
+          <div class="text-3xl mb-1">{{ option.emoji }}</div>
+          <div class="text-xs md:text-sm text-vs-text-muted">{{ option.label }}</div>
+        </div>
       </div>
     </div>
     
     <!-- Total Votes -->
     <div class="text-center mt-8 text-vs-text-muted">
-      Gesamt: {{ totalVotes }} {{ totalVotes === 1 ? 'Stimme' : 'Stimmen' }}
+      Total: {{ totalVotes }} {{ totalVotes === 1 ? 'Vote' : 'Votes' }}
     </div>
   </div>
 </template>
@@ -75,13 +81,13 @@ const getPercentage = (label) => {
 
 <style scoped>
 .result-bar {
-  transform-origin: left;
-  animation: growRight 1s ease-out forwards;
+  transform-origin: bottom;
+  animation: growUp 1s ease-out forwards;
 }
 
-@keyframes growRight {
+@keyframes growUp {
   from {
-    width: 0 !important;
+    height: 0 !important;
     opacity: 0;
   }
   to {

@@ -1,21 +1,21 @@
 ---
 id: voting2
-title: "Wie zufrieden bist du mit dem Sprint?"
-description: "Sprint Retrospektive - Dein ehrliches Feedback"
+title: "How satisfied are you with the overall experience of this PI?"
+description: "PI Experience Satisfaction - Your feedback matters"
 delaySeconds: 30
 options:
-  - label: "Sehr unzufrieden"
-    emoji: "😞"
-  - label: "Unzufrieden"
+  - label: "Very Dissatisfied"
+    emoji: "😠"
+  - label: "Dissatisfied"
     emoji: "😕"
   - label: "Neutral"
     emoji: "😐"
-  - label: "Zufrieden"
+  - label: "Satisfied"
     emoji: "🙂"
-  - label: "Sehr zufrieden"
+  - label: "Very Satisfied"
     emoji: "😄"
 ---
 
-# Sprint Retrospektive
+# PI Experience Satisfaction
 
-Wie zufrieden warst du mit dem letzten Sprint?
+How satisfied are you with the overall PI experience?

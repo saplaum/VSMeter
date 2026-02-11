@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h3 class="text-lg font-semibold mb-4">Voting-Link teilen</h3>
+    <h3 class="text-lg font-semibold mb-4">Share Voting Link</h3>
     <div class="flex gap-3">
       <input
         type="text"
@@ -14,11 +14,11 @@
         class="btn-primary whitespace-nowrap"
         :class="{ 'opacity-50': copied }"
       >
-        {{ copied ? '✓ Kopiert' : 'Kopieren' }}
+        {{ copied ? '✓ Copied' : 'Copy' }}
       </button>
     </div>
     <p class="text-vs-text-muted text-sm mt-3">
-      Teile diesen Link mit allen Teilnehmern
+      Share this link with all participants
     </p>
   </div>
 </template>

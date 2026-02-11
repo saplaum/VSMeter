@@ -1,5 +1,20 @@
 import { ref } from 'vue';
-import matter from 'gray-matter';
+import yaml from 'js-yaml';
+
+// Simple YAML frontmatter parser (browser-compatible)
+function parseFrontmatter(content) {
+  const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
+  if (!match) return {};
+  
+  const yamlContent = match[1];
+  
+  try {
+    return yaml.load(yamlContent);
+  } catch (err) {
+    console.error('YAML parse error:', err);
+    return {};
+  }
+}
 
 // Load and parse voting configuration from markdown files
 export function useVotingConfig() {
@@ -20,10 +35,10 @@ export function useVotingConfig() {
 
       for (const id of votingIds) {
         try {
-          const response = await fetch(`/votings/${id}.md`);
+          const response = await fetch(`${import.meta.env.BASE_URL}votings/${id}.md`);
           if (response.ok) {
             const content = await response.text();
-            const { data } = matter(content);
+            const data = parseFrontmatter(content);
             loadedVotings.push(data);
           }
         } catch (err) {
@@ -43,13 +58,13 @@ export function useVotingConfig() {
   // Load a single voting config
   const loadVoting = async (votingId) => {
     try {
-      const response = await fetch(`/votings/${votingId}.md`);
+      const response = await fetch(`${import.meta.env.BASE_URL}votings/${votingId}.md`);
       if (!response.ok) {
         throw new Error(`Voting ${votingId} not found`);
       }
       
       const content = await response.text();
-      const { data } = matter(content);
+      const data = parseFrontmatter(content);
       return data;
     } catch (err) {
       console.error(`Error loading voting ${votingId}:`, err);

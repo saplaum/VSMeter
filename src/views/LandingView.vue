@@ -5,19 +5,19 @@
       <header class="text-center mb-12">
         <h1 class="text-5xl font-bold mb-4">VSMeter</h1>
         <p class="text-vs-text-muted text-lg">
-          Anonyme Live-Abstimmungen in Echtzeit via Peer-to-Peer
+          Anonymous live voting in real-time via Peer-to-Peer
         </p>
       </header>
 
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-vs-bar-mid"></div>
-        <p class="mt-4 text-vs-text-muted">Lade Votings...</p>
+        <p class="mt-4 text-vs-text-muted">Loading votings...</p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="card text-center py-8">
-        <p class="text-red-400">Fehler beim Laden der Votings: {{ error }}</p>
+        <p class="text-red-400">Error loading votings: {{ error }}</p>
       </div>
 
       <!-- Votings List -->
@@ -31,7 +31,7 @@
 
       <!-- Info Section -->
       <div class="mt-16 text-center text-vs-text-muted text-sm">
-        <p>Keine Datenspeicherung • Peer-to-Peer • Open Source</p>
+        <p>No data storage • Peer-to-Peer • Open Source</p>
       </div>
     </div>
   </div>

@@ -8,8 +8,8 @@
     @click="$emit('select', option.label)"
     :disabled="disabled"
   >
-    <span class="text-5xl">{{ option.emoji }}</span>
-    <span class="text-xl font-medium">{{ option.label }}</span>
+    <span class="text-4xl">{{ option.emoji }}</span>
+    <span class="text-sm font-medium text-center">{{ option.label }}</span>
   </button>
 </template>
 

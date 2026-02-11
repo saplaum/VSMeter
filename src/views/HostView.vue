@@ -18,14 +18,14 @@
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-vs-bar-mid"></div>
-        <p class="mt-4 text-vs-text-muted">Voting wird geladen...</p>
+        <p class="mt-4 text-vs-text-muted">Loading voting...</p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="card text-center py-8">
         <p class="text-red-400 mb-4">{{ error }}</p>
         <router-link to="/" class="btn-secondary">
-          Zurück zur Startseite
+          Back to Home
         </router-link>
       </div>
 
@@ -38,20 +38,30 @@
         <div class="card">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-semibold mb-2">Teilnehmer</h3>
+              <h3 class="text-lg font-semibold mb-2">Participants</h3>
               <p class="text-3xl font-bold text-vs-bar-accent">
-                {{ voteCount }} von {{ participantCount }}
+                {{ voteCount }} of {{ participantCount }}
               </p>
-              <p class="text-vs-text-muted text-sm mt-1">haben abgestimmt</p>
+              <p class="text-vs-text-muted text-sm mt-1">have voted</p>
             </div>
             
             <!-- Timer -->
             <div v-if="isActive && !resultsRevealed">
-              <Timer :seconds="timeRemaining" message="bis Ergebnisse sichtbar" />
+              <Timer :seconds="timeRemaining" message="until results visible" />
             </div>
             
+            <!-- Start Button -->
             <div v-else-if="!isActive && !resultsRevealed" class="text-center">
-              <p class="text-vs-text-muted">Warte auf erste Stimme...</p>
+              <button 
+                @click="handleStartVoting" 
+                class="btn-primary"
+                :disabled="participantCount === 0"
+              >
+                Start Voting
+              </button>
+              <p class="text-vs-text-muted text-sm mt-2">
+                {{ participantCount === 0 ? 'Waiting for participants...' : `${participantCount} participants connected` }}
+              </p>
             </div>
           </div>
         </div>
@@ -59,7 +69,7 @@
         <!-- Results -->
         <div v-if="resultsRevealed" class="space-y-6">
           <div class="card">
-            <h2 class="text-2xl font-bold mb-6 text-center">Ergebnisse</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center">Results</h2>
             <ResultChart
               :options="config.options"
               :results="results"
@@ -70,7 +80,7 @@
           <!-- Reset Button -->
           <div class="text-center">
             <button @click="handleReset" class="btn-secondary">
-              Voting zurücksetzen
+              Reset Voting
             </button>
           </div>
         </div>
@@ -79,10 +89,10 @@
         <div v-else class="card text-center py-12">
           <div class="text-6xl mb-4">⏳</div>
           <p class="text-xl text-vs-text-muted">
-            Warte auf Teilnehmer...
+            Waiting for participants...
           </p>
           <p class="text-sm text-vs-text-muted mt-2">
-            Timer startet automatisch bei der ersten Stimme
+            Timer starts automatically with first vote or manually
           </p>
         </div>
       </div>
@@ -141,6 +151,8 @@ const {
   results,
   initHost,
   broadcastResults,
+  broadcastTimer,
+  broadcastTimerStart,
   reset,
 } = useWebRTCHost(computed(() => config.value));
 
@@ -148,13 +160,21 @@ const {
 const delaySeconds = computed(() => config.value?.delaySeconds || 30);
 const { timeRemaining, isActive, isComplete, start: startTimer, reset: resetTimer } = useTimer(delaySeconds.value);
 
-// Watch for first vote to start timer
-watch(voteCount, (newCount, oldCount) => {
-  if (newCount > 0 && oldCount === 0 && !isActive.value && !resultsRevealed.value) {
-    console.log('First vote received, starting timer');
-    startTimer();
+// Broadcast timer updates to all participants
+watch(timeRemaining, (newTime) => {
+  if (isActive.value) {
+    broadcastTimer(newTime, true);
   }
 });
+
+// Manual start function
+const handleStartVoting = () => {
+  if (!isActive.value && !resultsRevealed.value) {
+    console.log('Manually starting timer');
+    startTimer();
+    broadcastTimerStart();
+  }
+};
 
 // Watch timer completion
 watch(isComplete, (completed) => {
@@ -168,8 +188,9 @@ watch(isComplete, (completed) => {
 // Computed vote URL
 const voteUrl = computed(() => {
   if (typeof window === 'undefined') return '';
-  const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '');
-  return `${baseUrl}/vote/${props.votingId}/${roomId.value}`;
+  // Use router to get the base URL properly
+  const baseUrl = window.location.origin + import.meta.env.BASE_URL;
+  return `${baseUrl}vote/${props.votingId}/${roomId.value}`;
 });
 
 const handleReset = () => {

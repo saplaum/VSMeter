@@ -1,19 +1,21 @@
 ---
 id: voting1
-title: "Welches Framework bevorzugst du?"
-description: "Abstimmung über das nächste Projekt-Framework"
+title: "Reflecting on the last PI Planning and the progress made during the PI, how successful do you consider this PI overall?"
+description: "PI Planning Retrospective - Your honest feedback"
 delaySeconds: 30
 options:
-  - label: "Vue.js"
-    emoji: "🟢"
-  - label: "React"
-    emoji: "⚛️"
-  - label: "Svelte"
-    emoji: "🔥"
-  - label: "Angular"
-    emoji: "🔺"
+  - label: "Not Successful"
+    emoji: "😠"
+  - label: "Slightly Successful"
+    emoji: "😕"
+  - label: "Moderately Successful"
+    emoji: "😐"
+  - label: "Successful"
+    emoji: "🙂"
+  - label: "Very Successful"
+    emoji: "😄"
 ---
 
-# Framework Voting
+# PI Planning Retrospective
 
-Bitte wähle das Framework, das wir für unser nächstes Projekt verwenden sollen.
+How successful do you consider the overall PI?

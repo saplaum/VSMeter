@@ -8,7 +8,7 @@
         </div>
         <p class="text-vs-text-muted mb-4">{{ voting.description }}</p>
         <div class="flex items-center gap-4 text-sm text-vs-text-muted">
-          <span>{{ voting.options?.length || 0 }} Optionen</span>
+          <span>{{ voting.options?.length || 0 }} Options</span>
           <span>•</span>
           <span>{{ voting.delaySeconds }}s Timer</span>
         </div>
@@ -20,7 +20,7 @@
         :to="{ name: 'Host', params: { votingId: voting.id } }"
         class="btn-primary inline-block text-center w-full"
       >
-        Als Host starten →
+        Start as Host →
       </router-link>
     </div>
   </div>

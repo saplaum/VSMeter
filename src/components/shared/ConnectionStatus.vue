@@ -47,13 +47,13 @@ const dotClass = computed(() => {
 const statusText = computed(() => {
   switch (props.status) {
     case CONNECTION_STATUS.CONNECTED:
-      return 'Verbunden';
+      return 'Connected';
     case CONNECTION_STATUS.CONNECTING:
-      return 'Verbinde...';
+      return 'Connecting...';
     case CONNECTION_STATUS.ERROR:
-      return 'Fehler';
+      return 'Error';
     default:
-      return 'Getrennt';
+      return 'Disconnected';
   }
 });
 </script>

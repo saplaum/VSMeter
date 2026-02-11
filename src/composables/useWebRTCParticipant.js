@@ -11,6 +11,8 @@ export function useWebRTCParticipant(roomId) {
   const results = ref(null);
   const participantCount = ref(0);
   const voteCount = ref(0);
+  const timeRemaining = ref(0);
+  const timerActive = ref(false);
 
   const connect = () => {
     return new Promise((resolve, reject) => {
@@ -76,8 +78,18 @@ export function useWebRTCParticipant(roomId) {
         voteCount.value = data.voteCount || 0;
         break;
         
+      case MESSAGE_TYPES.TIMER_UPDATE:
+        timeRemaining.value = data.timeRemaining || 0;
+        timerActive.value = data.isActive || false;
+        break;
+        
+      case MESSAGE_TYPES.TIMER_START:
+        timerActive.value = true;
+        break;
+        
       case MESSAGE_TYPES.RESULTS:
         results.value = data.results;
+        timerActive.value = false;
         break;
         
       case MESSAGE_TYPES.RESET:
@@ -85,6 +97,8 @@ export function useWebRTCParticipant(roomId) {
         results.value = null;
         participantCount.value = 0;
         voteCount.value = 0;
+        timeRemaining.value = 0;
+        timerActive.value = false;
         break;
     }
   };
@@ -133,6 +147,8 @@ export function useWebRTCParticipant(roomId) {
     results,
     participantCount,
     voteCount,
+    timeRemaining,
+    timerActive,
     connect,
     vote,
     destroy,

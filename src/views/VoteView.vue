@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-vs-dark p-8">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">
       <!-- Header -->
       <header class="mb-8 text-center">
         <h1 class="text-3xl font-bold mb-2">{{ config?.title || 'Loading...' }}</h1>
@@ -8,33 +8,36 @@
         <div class="flex items-center justify-center gap-4">
           <ConnectionStatus :status="connectionStatus" />
           <Timer 
-            v-if="!results && connectionStatus === 'connected'"
-            :seconds="30" 
-            message=""
+            v-if="timerActive && !results"
+            :seconds="timeRemaining" 
+            message="until results visible"
           />
+          <div v-else-if="!timerActive && !results && connectionStatus === 'connected'" class="text-vs-text-muted text-sm">
+            Waiting for voting to start...
+          </div>
         </div>
       </header>
 
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-vs-bar-mid"></div>
-        <p class="mt-4 text-vs-text-muted">Verbinde...</p>
+        <p class="mt-4 text-vs-text-muted">Connecting...</p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="card text-center py-8">
         <p class="text-red-400 mb-4">{{ error }}</p>
         <router-link to="/" class="btn-secondary">
-          Zurück zur Startseite
+          Back to Home
         </router-link>
       </div>
 
       <!-- Voting Active -->
       <div v-else-if="!results" class="space-y-6">
         <div class="card">
-          <h2 class="text-xl font-semibold mb-6 text-center">Wähle deine Option:</h2>
+          <h2 class="text-xl font-semibold mb-6 text-center">Choose your option:</h2>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex justify-center gap-3 flex-nowrap overflow-x-auto">
             <VotingOption
               v-for="option in config.options"
               :key="option.label"
@@ -49,24 +52,24 @@
         <!-- Vote Confirmation -->
         <div v-if="myVote" class="card text-center">
           <p class="text-vs-text-muted">
-            Deine Wahl: <span class="text-vs-bar-accent font-semibold">{{ myVote }}</span> ✓
+            Your choice: <span class="text-vs-bar-accent font-semibold">{{ myVote }}</span> ✓
           </p>
           <p class="text-sm text-vs-text-muted mt-2">
-            Du kannst deine Wahl noch ändern
+            You can still change your vote
           </p>
         </div>
 
         <!-- Waiting Info -->
         <div class="text-center text-vs-text-muted text-sm">
-          <p>{{ participantCount }} Teilnehmer verbunden</p>
-          <p v-if="voteCount > 0">{{ voteCount }} haben bereits abgestimmt</p>
+          <p>{{ participantCount }} participants connected</p>
+          <p v-if="voteCount > 0">{{ voteCount }} have already voted</p>
         </div>
       </div>
 
       <!-- Results View -->
       <div v-else class="space-y-6">
         <div class="card">
-          <h2 class="text-2xl font-bold mb-6 text-center">Ergebnisse</h2>
+          <h2 class="text-2xl font-bold mb-6 text-center">Results</h2>
           <ResultChart
             :options="config.options"
             :results="results"
@@ -76,7 +79,7 @@
         </div>
 
         <div class="text-center text-vs-text-muted text-sm">
-          <p>Voting abgeschlossen</p>
+          <p>Voting completed</p>
         </div>
       </div>
     </div>
@@ -133,6 +136,8 @@ const {
   results,
   participantCount,
   voteCount,
+  timeRemaining,
+  timerActive,
   connect,
   vote,
 } = useWebRTCParticipant(props.roomId);
