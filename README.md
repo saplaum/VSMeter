@@ -1,6 +1,6 @@
 # VSMeter 🎯
 
-Ein minimalistischer Mentimeter-Klon für anonyme Live-Abstimmungen via WebRTC Peer-to-Peer.
+A minimalist Mentimeter clone for anonymous live voting via WebRTC Peer-to-Peer.
 
 ![VSMeter](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vue.js)
 ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwind-css)
@@ -8,61 +8,93 @@ Ein minimalistischer Mentimeter-Klon für anonyme Live-Abstimmungen via WebRTC P
 
 ## Features
 
-✅ **Peer-to-Peer** - Keine Server oder Backend notwendig  
-✅ **Anonyme Abstimmungen** - Keine Datenerfassung oder Tracking  
-✅ **Live-Synchronisation** - Echtzeitübertragung der Votes via WebRTC  
-✅ **Einfache Konfiguration** - Votings per Markdown definieren  
-✅ **GitHub Pages kompatibel** - Statisches Hosting ohne Kosten  
-✅ **Timer-basiert** - Ergebnisse werden nach konfigurierbarer Zeit angezeigt  
-✅ **Reset-Funktion** - Votings mehrfach durchführbar  
+✅ **Peer-to-Peer** - No server or backend required  
+✅ **Anonymous Voting** - No data collection or tracking  
+✅ **Live Synchronization** - Real-time vote transmission via WebRTC  
+✅ **Simple Configuration** - Define votings via Markdown  
+✅ **GitHub Pages Compatible** - Static hosting at no cost  
+✅ **Timer-based** - Results displayed after configurable countdown  
+✅ **Manual Start** - Host controls when voting begins  
+✅ **Reset Function** - Run votings multiple times  
 
 ## Demo
 
-**Live Demo:** `https://USERNAME.github.io/vsmeter/`
+**Live Demo:** `https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/`
 
 ## Quick Start
 
-### 1. Repository forken oder klonen
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/USERNAME/vsmeter.git
-cd vsmeter
+git clone https://git.i.mercedes-benz.com/SAPLAUM/VSMeter.git
+cd VSMeter
 npm install
 ```
 
-### 2. Lokal entwickeln
+### 2. Local development
 
 ```bash
 npm run dev
 ```
 
-Öffne http://localhost:5173
+Open http://localhost:5173
 
-### 3. Auf GitHub Pages deployen
+### 3. Deploy to GitHub Pages (Manual)
 
-1. Push zu GitHub
-2. Gehe zu **Settings** → **Pages**
-3. Source: **GitHub Actions**
-4. Der Workflow deployed automatisch bei jedem Push auf `main`
+Since GitHub Actions runners are not available, deploy manually:
 
-**Wichtig:** In `vite.config.js` die `base` URL anpassen:
+```bash
+# Build the project
+npm run build
+
+# The dist folder is generated
+# Push dist folder to gh-pages branch (see deployment section below)
+```
+
+**Important:** Adjust the `base` URL in `vite.config.js`:
 
 ```javascript
 export default defineConfig({
-  base: '/DEIN-REPO-NAME/',  // z.B. '/vsmeter/'
+  base: '/YOUR-REPO-NAME/',  // e.g. '/VSMeter/'
   // ...
 })
 ```
 
-## Neues Voting erstellen
+## Deployment Without GitHub Actions
 
-Erstelle eine neue Markdown-Datei in `public/votings/`:
+### Option 1: Manual gh-pages Push
+
+```bash
+# Build the project
+npm run build
+
+# Navigate to dist folder
+cd dist
+
+# Initialize git and push to gh-pages branch
+git init
+git add -A
+git commit -m 'deploy'
+git branch -M gh-pages
+git remote add origin https://git.i.mercedes-benz.com/SAPLAUM/VSMeter.git
+git push -f origin gh-pages
+
+cd ..
+```
+
+### Option 2: Keep dist in Repository
+
+Remove `dist` from `.gitignore`, commit it, and configure GitHub Pages to serve from `/dist` folder on `main` branch.
+
+## Create New Voting
+
+Create a new Markdown file in `public/votings/`:
 
 ```markdown
 ---
 id: voting3
-title: "Deine Frage?"
-description: "Kurze Beschreibung"
+title: "Your question?"
+description: "Short description"
 delaySeconds: 30
 options:
   - label: "Option 1"
@@ -74,33 +106,33 @@ options:
 ---
 ```
 
-Dann in `src/composables/useVotingConfig.js` die ID hinzufügen:
+Then add the ID in `src/composables/useVotingConfig.js`:
 
 ```javascript
 const votingIds = ['voting1', 'voting2', 'voting3'];
 ```
 
-## Verwendung
+## Usage
 
-### Als Host
+### As Host
 
-1. Öffne die Landing Page
-2. Klicke auf "Als Host starten" bei einem Voting
-3. Teile den generierten Link mit Teilnehmern
-4. Der Timer startet automatisch bei der ersten Stimme
-5. Nach Ablauf des Timers werden Ergebnisse angezeigt
-6. Optional: Voting mit "Reset" neu starten
+1. Open the landing page
+2. Click "Start as Host" for a voting
+3. Share the generated link with participants
+4. Click "Start Voting" button to begin the countdown
+5. Results are displayed after the timer expires
+6. Optional: Reset voting to start a new round
 
-### Als Teilnehmer
+### As Participant
 
-1. Öffne den vom Host geteilten Link
-2. Wähle deine Option
-3. Du kannst deine Wahl ändern bis der Timer abläuft
-4. Nach dem Timer werden die Ergebnisse angezeigt
+1. Open the link shared by the host
+2. Select your option
+3. You can change your vote until the timer expires
+4. Results are shown after the timer completes
 
-## Technische Details
+## Technical Details
 
-### Architektur
+### Architecture
 
 ```
 ┌─────────────┐
@@ -115,9 +147,9 @@ const votingIds = ['voting1', 'voting2', 'voting3'];
 └─────┘ └─────┘
 ```
 
-- **Host** = Koordinator, aggregiert Votes, verwaltet Timer
-- **Participants** = Verbinden sich direkt mit Host via WebRTC
-- **Keine zentrale Datenbank** = Alles läuft im Browser
+- **Host** = Coordinator, aggregates votes, manages timer
+- **Participants** = Connect directly to host via WebRTC
+- **No central database** = Everything runs in the browser
 
 ### Tech Stack
 
@@ -126,53 +158,52 @@ const votingIds = ['voting1', 'voting2', 'voting3'];
 - **Styling**: Tailwind CSS 3 (Custom Mentimeter Dark Theme)
 - **WebRTC**: PeerJS 1.5
 - **Routing**: Vue Router 4
-- **Markdown**: gray-matter
+- **Markdown**: js-yaml (YAML frontmatter parser)
 
-### Ordnerstruktur
+### Folder Structure
 
 ```
-vsmeter/
-├── public/votings/        # Voting-Konfigurationen (Markdown)
+VSMeter/
+├── public/votings/        # Voting configurations (Markdown)
 ├── src/
 │   ├── components/
-│   │   ├── host/         # Host-spezifische Components
-│   │   ├── vote/         # Participant Components
-│   │   ├── shared/       # Gemeinsame Components
-│   │   └── landing/      # Landing Page Components
-│   ├── composables/      # Vue Composables (WebRTC, Timer, Config)
-│   ├── utils/            # Utilities (roomId Generator, Constants)
-│   ├── views/            # Route Views (Landing, Host, Vote)
-│   └── router/           # Vue Router
-└── .github/workflows/    # GitHub Actions Deployment
+│   │   ├── landing/       # Landing page components
+│   │   ├── vote/          # Participant components
+│   │   └── shared/        # Shared components
+│   ├── composables/       # Vue Composables (WebRTC, Timer, Config)
+│   ├── utils/             # Utilities (roomId Generator, Constants)
+│   ├── views/             # Route Views (Landing, Host, Vote)
+│   └── router/            # Vue Router
+└── .github/workflows/     # GitHub Actions (optional)
 ```
 
-## Limitierungen
+## Limitations
 
-⚠️ **Host-Browser muss online bleiben** während des Votings  
-⚠️ **Empfohlene Teilnehmerzahl**: ~20-30 (WebRTC P2P Limit)  
-⚠️ **Keine Persistenz**: Bei Host-Disconnect ist Voting verloren  
-⚠️ **Firewalls**: WebRTC kann in manchen Netzwerken blockiert sein  
+⚠️ **Host browser must stay online** during voting  
+⚠️ **Recommended participant count**: ~20-30 (WebRTC P2P limit)  
+⚠️ **No persistence**: If host disconnects, voting is lost  
+⚠️ **Firewalls**: WebRTC can be blocked in some networks  
 
-## Konfiguration
+## Configuration
 
-### Timer anpassen
+### Adjust Timer
 
-In der Voting-Markdown-Datei:
+In the voting Markdown file:
 
 ```yaml
-delaySeconds: 45  # Sekunden bis Ergebnisse sichtbar werden
+delaySeconds: 45  # Seconds until results are visible
 ```
 
-### Design anpassen
+### Customize Design
 
-Farben in `tailwind.config.js`:
+Colors in `tailwind.config.js`:
 
 ```javascript
 colors: {
-  'vs-dark': '#000000',      // Hintergrund
-  'vs-bar-base': '#3B82A0',  // Balken Dunkelblau
-  'vs-bar-mid': '#5DADE2',   // Balken Mittelblau
-  'vs-bar-top': '#A8E6FF',   // Balken Hellblau
+  'vs-dark': '#000000',      // Background
+  'vs-bar-base': '#3B82A0',  // Bar dark blue
+  'vs-bar-mid': '#5DADE2',   // Bar medium blue
+  'vs-bar-top': '#A8E6FF',   // Bar light blue
 }
 ```
 
@@ -181,14 +212,14 @@ colors: {
 ### Commands
 
 ```bash
-npm run dev      # Dev Server starten
-npm run build    # Production Build
-npm run preview  # Build Preview
+npm run dev      # Start dev server
+npm run build    # Production build
+npm run preview  # Preview build
 ```
 
 ### Debugging
 
-WebRTC Debug-Logs sind aktiviert. In der Browser-Console:
+WebRTC debug logs are enabled. In browser console:
 
 ```javascript
 // Host
@@ -202,60 +233,78 @@ console.log('Results:', results.value)
 
 ## Troubleshooting
 
-### Teilnehmer können sich nicht verbinden
+### Participants cannot connect
 
-1. Prüfe, ob Host online ist
-2. Prüfe Room-ID im Link
-3. Prüfe Browser-Console auf Fehler
-4. Versuche anderen Browser (Chrome/Firefox empfohlen)
+1. Check if host is online
+2. Check room ID in link
+3. Check browser console for errors
+4. Try different browser (Chrome/Firefox recommended)
 
-### Ergebnisse werden nicht angezeigt
+### Results not displayed
 
-1. Warte bis Timer abgelaufen ist (Host-Ansicht zeigt Countdown)
-2. Prüfe ob Host noch verbunden ist
-3. Refresh der Seite
+1. Wait until timer expires (host view shows countdown)
+2. Check if host is still connected
+3. Refresh the page
 
-### Votings werden nicht geladen
+### Votings not loading
 
-1. Prüfe, ob Markdown-Dateien in `public/votings/` liegen
-2. Prüfe YAML Frontmatter Syntax
-3. Prüfe `useVotingConfig.js` ob IDs eingetragen sind
+1. Check if Markdown files are in `public/votings/`
+2. Check YAML frontmatter syntax
+3. Check `useVotingConfig.js` if IDs are registered
+
+## Message Protocol
+
+WebRTC messages exchanged between host and participants:
+
+- `VOTE` / `VOTE_UPDATE` - Participant → Host
+- `STATE_UPDATE` - Host → Participants (vote count, participant count)
+- `TIMER_UPDATE` - Host → Participants (seconds remaining, isActive)
+- `TIMER_START` - Host → Participants (manual start signal)
+- `RESULTS` - Host → Participants (final results object)
+- `RESET` - Host → Participants (clear session)
+
+## Current Votings
+
+Two PI Planning votings are configured:
+
+1. **Voting 1**: Overall PI success rating (5-point scale with face emojis)
+2. **Voting 2**: PI experience satisfaction (5-point scale with face emojis)
 
 ## Contributing
 
-Contributions willkommen! Bitte:
+Contributions welcome! Please:
 
-1. Fork das Repo
-2. Erstelle einen Feature Branch
-3. Committe deine Changes
-4. Push und erstelle einen Pull Request
+1. Fork the repo
+2. Create a feature branch
+3. Commit your changes
+4. Push and create a pull request
 
 ## Roadmap
 
 ### Version 1.1
-- [ ] Multiple-Select Votings
-- [ ] Freie Text-Eingaben
-- [ ] Export als PNG/CSV
+- [ ] Multiple-select votings
+- [ ] Free text inputs
+- [ ] Export as PNG/CSV
 
 ### Version 1.2
-- [ ] QR-Code für Vote-Link
-- [ ] Voting pausieren/fortsetzen
-- [ ] Dark/Light Theme Toggle
+- [ ] QR code for vote link
+- [ ] Pause/resume voting
+- [ ] Dark/Light theme toggle
 
 ### Version 2.0
-- [ ] Optional: Firebase Backend für Persistenz
-- [ ] Voting-Historie
-- [ ] Multi-Host Support
+- [ ] Optional: Firebase backend for persistence
+- [ ] Voting history
+- [ ] Multi-host support
 
-## Lizenz
+## License
 
 MIT License
 
 ## Credits
 
-Inspiriert von [Mentimeter](https://www.mentimeter.com/)
+Inspired by [Mentimeter](https://www.mentimeter.com/)
 
-Gebaut mit Vue.js, Tailwind CSS, und PeerJS
+Built with Vue.js, Tailwind CSS, and PeerJS
 
 ---
 
