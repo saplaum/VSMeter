@@ -149,7 +149,7 @@
 
             <!-- Reset Button -->
             <div class="text-center">
-              <button @click="handleReset" class="btn-primary bg-red-600 hover:bg-red-700">
+              <button @click="handleReset" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
                 🔄 Reset Voting & Start New Round
               </button>
               <p class="text-vs-text-muted text-sm mt-2">

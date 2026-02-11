@@ -30,8 +30,14 @@
     @apply border-vs-bar-accent bg-vs-bar-base bg-opacity-20;
   }
   
-  .voting-option:disabled {
-    @apply opacity-50 cursor-not-allowed;
+  .voting-option:disabled,
+  .voting-option.disabled {
+    @apply opacity-40 cursor-not-allowed border-vs-border;
+  }
+  
+  .voting-option:disabled:hover,
+  .voting-option.disabled:hover {
+    @apply border-vs-border;
   }
   
   /* Card Components */

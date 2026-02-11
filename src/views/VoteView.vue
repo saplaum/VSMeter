@@ -43,9 +43,16 @@
               :key="option.label"
               :option="option"
               :selected="myVote === option.label"
-              :disabled="connectionStatus !== 'connected'"
+              :disabled="connectionStatus !== 'connected' || !timerActive"
               @select="handleVote"
             />
+          </div>
+          
+          <!-- Waiting for host message -->
+          <div v-if="!timerActive && connectionStatus === 'connected'" class="mt-6 text-center">
+            <p class="text-vs-text-muted text-lg">
+              ⏳ Waiting for host to start voting...
+            </p>
           </div>
         </div>
 
