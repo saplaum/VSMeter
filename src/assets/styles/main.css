@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-vs-dark text-vs-text antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+  }
+}
+
+@layer components {
+  /* Bar Gradient (Mentimeter Style) */
+  .bar-gradient {
+    background: linear-gradient(to top, theme('colors.vs-bar-base'), theme('colors.vs-bar-mid'), theme('colors.vs-bar-top'));
+  }
+  
+  /* Voting Option Button */
+  .voting-option {
+    @apply flex flex-col items-center gap-4 p-8 
+           bg-vs-dark-light border-2 border-vs-border 
+           rounded-xl hover:border-vs-bar-accent 
+           transition-all duration-200 cursor-pointer;
+  }
+  
+  .voting-option.selected {
+    @apply border-vs-bar-accent bg-vs-bar-base bg-opacity-20;
+  }
+  
+  .voting-option:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+  
+  /* Card Components */
+  .card {
+    @apply bg-vs-dark-light border border-vs-border rounded-xl p-6;
+  }
+  
+  /* Button Styles */
+  .btn-primary {
+    @apply bg-vs-bar-mid hover:bg-vs-bar-accent text-vs-dark font-semibold 
+           py-3 px-6 rounded-lg transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-vs-dark-light hover:bg-vs-border border border-vs-border 
+           text-vs-text font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  /* Animation for Result Bars */
+  .result-bar {
+    transform-origin: bottom;
+    animation: growUp 1s ease-out forwards;
+  }
+  
+  /* Staggered animation delays */
+  .result-bar:nth-child(1) { animation-delay: 0.1s; }
+  .result-bar:nth-child(2) { animation-delay: 0.2s; }
+  .result-bar:nth-child(3) { animation-delay: 0.3s; }
+  .result-bar:nth-child(4) { animation-delay: 0.4s; }
+  .result-bar:nth-child(5) { animation-delay: 0.5s; }
+  .result-bar:nth-child(6) { animation-delay: 0.6s; }
+  
+  @keyframes growUp {
+    from {
+      transform: scaleY(0);
+      opacity: 0;
+    }
+    to {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+  }
+}

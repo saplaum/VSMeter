@@ -1,0 +1,19 @@
+// VSMeter Constants
+
+export const DEFAULT_DELAY_SECONDS = 30;
+
+export const MESSAGE_TYPES = {
+  VOTE: 'VOTE',
+  VOTE_UPDATE: 'VOTE_UPDATE',
+  REQUEST_STATE: 'REQUEST_STATE',
+  STATE_UPDATE: 'STATE_UPDATE',
+  RESULTS: 'RESULTS',
+  RESET: 'RESET',
+};
+
+export const CONNECTION_STATUS = {
+  DISCONNECTED: 'disconnected',
+  CONNECTING: 'connecting',
+  CONNECTED: 'connected',
+  ERROR: 'error',
+};
