@@ -2,7 +2,7 @@
   <div class="results-container py-8">
     <div class="flex justify-center items-end gap-6 md:gap-8">
       <div
-        v-for="(option, index) in sortedOptions"
+        v-for="(option, index) in options"
         :key="option.label"
         class="result-item flex flex-col items-center"
       >
@@ -43,8 +43,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-
 const props = defineProps({
   options: {
     type: Array,
@@ -62,14 +60,6 @@ const props = defineProps({
     type: String,
     default: null,
   },
-});
-
-const sortedOptions = computed(() => {
-  return [...props.options].sort((a, b) => {
-    const votesA = props.results[a.label] || 0;
-    const votesB = props.results[b.label] || 0;
-    return votesB - votesA;
-  });
 });
 
 const getPercentage = (label) => {
