@@ -28,41 +28,41 @@
           <div class="space-y-6">
             <!-- Random Room ID Option -->
             <div class="space-y-3">
-              <label class="flex items-center space-x-3 cursor-pointer">
+              <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-800 p-3 rounded-lg transition-colors">
                 <input 
                   type="radio" 
                   v-model="roomIdMode" 
                   value="random"
-                  class="w-4 h-4 text-vs-bar-accent"
+                  class="w-5 h-5 text-blue-500 bg-gray-700 border-gray-600 focus:ring-blue-500 focus:ring-2"
                 />
-                <span class="text-lg">Generate random room ID</span>
+                <span class="text-lg font-medium">Generate random room ID</span>
               </label>
-              <p class="text-vs-text-muted text-sm ml-7">
+              <p class="text-vs-text-muted text-sm ml-11">
                 A new random room ID will be created (e.g., ABC-123)
               </p>
             </div>
 
             <!-- Custom Room ID Option -->
             <div class="space-y-3">
-              <label class="flex items-center space-x-3 cursor-pointer">
+              <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-800 p-3 rounded-lg transition-colors">
                 <input 
                   type="radio" 
                   v-model="roomIdMode" 
                   value="custom"
-                  class="w-4 h-4 text-vs-bar-accent"
+                  class="w-5 h-5 text-blue-500 bg-gray-700 border-gray-600 focus:ring-blue-500 focus:ring-2"
                 />
-                <span class="text-lg">Enter existing room ID</span>
+                <span class="text-lg font-medium">Enter existing room ID</span>
               </label>
-              <p class="text-vs-text-muted text-sm ml-7">
+              <p class="text-vs-text-muted text-sm ml-11">
                 Reuse a room ID you've already shared with participants
               </p>
               
-              <div v-if="roomIdMode === 'custom'" class="ml-7 mt-3">
+              <div v-if="roomIdMode === 'custom'" class="ml-11 mt-3">
                 <input 
                   v-model="customRoomIdInput"
                   type="text"
                   placeholder="e.g., ABC-123"
-                  class="w-full px-4 py-3 bg-vs-card-bg border border-gray-600 rounded-lg text-white font-mono text-lg focus:outline-none focus:ring-2 focus:ring-vs-bar-accent"
+                  class="w-full px-4 py-3 bg-gray-800 border-2 border-gray-600 rounded-lg text-white font-mono text-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-colors"
                   @input="formatRoomIdInput"
                   maxlength="7"
                 />
@@ -229,18 +229,18 @@ onMounted(async () => {
   }
 });
 
-// Validate room ID format (XXX-123)
+// Validate room ID format (XXX-YYY) - alphanumeric
 const isValidRoomId = computed(() => {
   if (roomIdMode.value === 'random') return true;
   const trimmed = customRoomIdInput.value.trim();
-  return /^[A-Z]{3}-\d{3}$/.test(trimmed);
+  return /^[A-Z0-9]{3}-[A-Z0-9]{3}$/.test(trimmed);
 });
 
 // Format room ID input
 const formatRoomIdInput = () => {
   let value = customRoomIdInput.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
   
-  // Auto-add hyphen after 3 letters
+  // Auto-add hyphen after 3 characters
   if (value.length >= 3 && value[3] !== '-') {
     value = value.slice(0, 3) + '-' + value.slice(3);
   }
@@ -249,7 +249,7 @@ const formatRoomIdInput = () => {
   
   // Update error message
   if (customRoomIdInput.value.length > 0 && !isValidRoomId.value) {
-    roomIdError.value = 'Format: ABC-123 (3 letters, hyphen, 3 numbers)';
+    roomIdError.value = 'Format: ABC-123 (3 characters, hyphen, 3 characters)';
   } else {
     roomIdError.value = '';
   }
