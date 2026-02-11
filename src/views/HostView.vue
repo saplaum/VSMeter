@@ -1,20 +1,6 @@
 <template>
   <div class="min-h-screen bg-vs-dark p-8">
     <div class="max-w-5xl mx-auto">
-      <!-- Header -->
-      <header class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h1 class="text-3xl font-bold mb-2">{{ config?.title || 'Loading...' }}</h1>
-            <p class="text-vs-text-muted">{{ config?.description }}</p>
-          </div>
-          <ConnectionStatus :status="connectionStatus" />
-        </div>
-        <div class="text-sm text-vs-text-muted">
-          Room: <span class="font-mono text-vs-bar-accent">{{ roomId }}</span>
-        </div>
-      </header>
-
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-vs-bar-mid"></div>
@@ -29,8 +15,92 @@
         </router-link>
       </div>
 
-      <!-- Main Content -->
-      <div v-else class="space-y-6">
+      <!-- Room Setup Screen (before connection) -->
+      <div v-else-if="!hostInitialized" class="space-y-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold mb-2">{{ config?.title || 'Loading...' }}</h1>
+          <p class="text-vs-text-muted">{{ config?.description }}</p>
+        </div>
+
+        <div class="card max-w-2xl mx-auto">
+          <h2 class="text-xl font-semibold mb-6">Room Setup</h2>
+          
+          <div class="space-y-6">
+            <!-- Random Room ID Option -->
+            <div class="space-y-3">
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input 
+                  type="radio" 
+                  v-model="roomIdMode" 
+                  value="random"
+                  class="w-4 h-4 text-vs-bar-accent"
+                />
+                <span class="text-lg">Generate random room ID</span>
+              </label>
+              <p class="text-vs-text-muted text-sm ml-7">
+                A new random room ID will be created (e.g., ABC-123)
+              </p>
+            </div>
+
+            <!-- Custom Room ID Option -->
+            <div class="space-y-3">
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input 
+                  type="radio" 
+                  v-model="roomIdMode" 
+                  value="custom"
+                  class="w-4 h-4 text-vs-bar-accent"
+                />
+                <span class="text-lg">Enter existing room ID</span>
+              </label>
+              <p class="text-vs-text-muted text-sm ml-7">
+                Reuse a room ID you've already shared with participants
+              </p>
+              
+              <div v-if="roomIdMode === 'custom'" class="ml-7 mt-3">
+                <input 
+                  v-model="customRoomIdInput"
+                  type="text"
+                  placeholder="e.g., ABC-123"
+                  class="w-full px-4 py-3 bg-vs-card-bg border border-gray-600 rounded-lg text-white font-mono text-lg focus:outline-none focus:ring-2 focus:ring-vs-bar-accent"
+                  @input="formatRoomIdInput"
+                  maxlength="7"
+                />
+                <p v-if="roomIdError" class="text-red-400 text-sm mt-2">{{ roomIdError }}</p>
+              </div>
+            </div>
+
+            <!-- Create Room Button -->
+            <div class="pt-4">
+              <button 
+                @click="handleCreateRoom" 
+                class="btn-primary w-full"
+                :disabled="isCreatingRoom || (roomIdMode === 'custom' && !isValidRoomId)"
+              >
+                {{ isCreatingRoom ? 'Creating room...' : 'Create Room & Start Session' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content (after connection established) -->
+      <div v-else>
+        <!-- Header -->
+        <header class="mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h1 class="text-3xl font-bold mb-2">{{ config?.title || 'Loading...' }}</h1>
+              <p class="text-vs-text-muted">{{ config?.description }}</p>
+            </div>
+            <ConnectionStatus :status="connectionStatus" />
+          </div>
+          <div class="text-sm text-vs-text-muted">
+            Room: <span class="font-mono text-vs-bar-accent">{{ roomId }}</span>
+          </div>
+        </header>
+
+        <div class="space-y-6">
         <!-- Share Link -->
         <ShareLink :url="voteUrl" />
 
@@ -139,21 +209,70 @@ const loading = ref(true);
 const error = ref(null);
 
 const resultsRevealed = ref(false);
+const hostInitialized = ref(false);
+const isCreatingRoom = ref(false);
+
+// Room ID setup
+const roomIdMode = ref('random');
+const customRoomIdInput = ref('');
+const roomIdError = ref('');
 
 // Load voting config
 onMounted(async () => {
   try {
     config.value = await loadVoting(props.votingId);
-    
-    // Initialize WebRTC Host
-    await initHost();
-    
     loading.value = false;
   } catch (err) {
     error.value = err.message || 'Fehler beim Laden des Votings';
     loading.value = false;
   }
 });
+
+// Validate room ID format (XXX-123)
+const isValidRoomId = computed(() => {
+  if (roomIdMode.value === 'random') return true;
+  const trimmed = customRoomIdInput.value.trim();
+  return /^[A-Z]{3}-\d{3}$/.test(trimmed);
+});
+
+// Format room ID input
+const formatRoomIdInput = () => {
+  let value = customRoomIdInput.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  
+  // Auto-add hyphen after 3 letters
+  if (value.length >= 3 && value[3] !== '-') {
+    value = value.slice(0, 3) + '-' + value.slice(3);
+  }
+  
+  customRoomIdInput.value = value.slice(0, 7);
+  
+  // Update error message
+  if (customRoomIdInput.value.length > 0 && !isValidRoomId.value) {
+    roomIdError.value = 'Format: ABC-123 (3 letters, hyphen, 3 numbers)';
+  } else {
+    roomIdError.value = '';
+  }
+};
+
+// Create room and initialize host
+const handleCreateRoom = async () => {
+  if (isCreatingRoom.value) return;
+  
+  isCreatingRoom.value = true;
+  
+  try {
+    const roomIdToUse = roomIdMode.value === 'custom' 
+      ? customRoomIdInput.value.trim() 
+      : null;
+    
+    await initHost(roomIdToUse);
+    hostInitialized.value = true;
+  } catch (err) {
+    error.value = 'Failed to create room: ' + err.message;
+  } finally {
+    isCreatingRoom.value = false;
+  }
+};
 
 // WebRTC Host
 const {

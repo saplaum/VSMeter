@@ -3,9 +3,9 @@ import Peer from 'peerjs';
 import { generateRoomId } from '../utils/roomId';
 import { MESSAGE_TYPES, CONNECTION_STATUS } from '../utils/constants';
 
-export function useWebRTCHost(votingConfig) {
+export function useWebRTCHost(votingConfig, customRoomId = null) {
   const peer = ref(null);
-  const roomId = ref(generateRoomId());
+  const roomId = ref(customRoomId || generateRoomId());
   const connectionStatus = ref(CONNECTION_STATUS.DISCONNECTED);
   
   // Store peer connections
@@ -40,9 +40,14 @@ export function useWebRTCHost(votingConfig) {
     return resultObj;
   });
 
-  const initHost = () => {
+  const initHost = (newRoomId = null) => {
     return new Promise((resolve, reject) => {
       try {
+        // Allow setting roomId at initialization time
+        if (newRoomId) {
+          roomId.value = newRoomId;
+        }
+        
         connectionStatus.value = CONNECTION_STATUS.CONNECTING;
         
         peer.value = new Peer(roomId.value, {
