@@ -22,6 +22,10 @@ if [ ! -d .git ]; then
   git remote add origin git@git.i.mercedes-benz.com:SAPLAUM/VSMeter.git
 fi
 
+# Add .nojekyll to bypass Jekyll processing
+echo "🔧 Adding .nojekyll file..."
+touch .nojekyll
+
 # Stage all files
 echo "📝 Staging files..."
 git add -A
