@@ -5,7 +5,7 @@
       <header class="mb-8 text-center">
         <h1 class="text-3xl font-bold mb-2">{{ config?.title || 'Loading...' }}</h1>
         <p class="text-vs-text-muted mb-4">{{ config?.description }}</p>
-        <div class="flex items-center justify-center gap-4">
+        <div class="flex flex-col items-center gap-3">
           <ConnectionStatus :status="connectionStatus" />
           <Timer 
             v-if="timerActive && !results"
