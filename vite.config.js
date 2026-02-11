@@ -3,9 +3,9 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [vue()],
-  base: '/SAPLAUM/VSMeter/',
+  base: mode === 'production' ? '/SAPLAUM/VSMeter/' : '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
@@ -16,4 +16,4 @@ export default defineConfig({
     assetsDir: 'assets',
     sourcemap: false
   }
-})
+}))
