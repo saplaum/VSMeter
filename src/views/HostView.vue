@@ -149,8 +149,9 @@
 
             <!-- Reset Button -->
             <div class="text-center">
-              <button @click="handleReset" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
-                🔄 Reset Voting & Start New Round
+              <button @click="handleReset" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 inline-flex items-center gap-2">
+                <RotateCcw :size="20" :stroke-width="2" />
+                <span>Reset Voting & Start New Round</span>
               </button>
               <p class="text-vs-text-muted text-sm mt-2">
                 This will clear all votes and start a new voting session
@@ -192,7 +193,7 @@ import { useRouter } from 'vue-router';
 import { useVotingConfig } from '../composables/useVotingConfig';
 import { useWebRTCHost } from '../composables/useWebRTCHost';
 import { useTimer } from '../composables/useTimer';
-import { Hourglass } from 'lucide-vue-next';
+import { Hourglass, RotateCcw } from 'lucide-vue-next';
 import ConnectionStatus from '../components/shared/ConnectionStatus.vue';
 import ShareLink from '../components/shared/ShareLink.vue';
 import Timer from '../components/shared/Timer.vue';
