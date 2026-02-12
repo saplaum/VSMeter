@@ -89,7 +89,9 @@ cd dist
 # 3. Initialize git (first time only)
 git init
 git branch -M gh-pages
-git remote add origin git@git.i.mercedes-benz.com:SAPLAUM/VSMeter.git
+# Use the origin remote URL from parent repository
+ORIGIN_URL=$(cd .. && git remote get-url origin)
+git remote add origin "$ORIGIN_URL"
 
 # 4. Stage and commit
 git add -A
@@ -114,7 +116,9 @@ cd dist
 # 3. Initialize git (first time only)
 git init
 git branch -M gh-pages
-git remote add origin git@github.com:saplaum/VSMeter.git
+# Use the public remote URL from parent repository
+PUBLIC_URL=$(cd .. && git remote get-url public)
+git remote add origin "$PUBLIC_URL"
 
 # 4. Stage and commit
 git add -A

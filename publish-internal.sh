@@ -24,7 +24,9 @@ if [ ! -d .git ]; then
   echo "🔧 Initializing git in dist folder..."
   git init
   git branch -M gh-pages
-  git remote add origin git@git.i.mercedes-benz.com:SAPLAUM/VSMeter.git
+  # Get the origin remote URL from parent repository
+  ORIGIN_URL=$(cd .. && git remote get-url origin)
+  git remote add origin "$ORIGIN_URL"
 fi
 
 # Add .nojekyll to bypass Jekyll processing
@@ -48,9 +50,6 @@ git push -f origin gh-pages
 cd ..
 
 echo ""
-echo "✅ Deployment complete!"
-echo ""
-echo "📍 Your app will be available at:"
-echo "   https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/"
+echo "✅ Internal deployment complete!"
 echo ""
 echo "⏱️  GitHub Pages may take 1-2 minutes to update."
