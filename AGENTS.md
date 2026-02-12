@@ -112,7 +112,26 @@ Deploy when:
 
 ## Deployment Workflow for AI Agents
 
-When a user asks to deploy or update the live site:
+**CRITICAL RULE**: 🚨 **NEVER deploy automatically without explicit user approval!** 🚨
+
+### Testing First (Always Required)
+
+Before deploying, **ALWAYS test locally first**:
+
+```bash
+# 1. Build the project
+npm run build
+
+# 2. Test the build locally (optional but recommended)
+npm run preview
+
+# 3. If issues found, fix them and rebuild
+# DO NOT deploy until user confirms everything works!
+```
+
+### Deployment (Only When User Explicitly Requests)
+
+When a user **explicitly asks** to deploy or update the live site:
 
 ```bash
 # 1. Ensure all changes are committed to main
@@ -120,13 +139,50 @@ git add .
 git commit -m "Your descriptive commit message"
 git push origin main
 
-# 2. Run the deployment script
+# 2. ASK USER: "Ready to deploy to production?"
+# WAIT for confirmation!
+
+# 3. Only after user confirms, run the deployment script
 ./publish.sh
 
-# 3. Verify deployment
+# 4. Verify deployment
 # Wait 1-2 minutes, then check:
 # https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/
 ```
+
+### Deployment Decision Tree
+
+```
+User makes code changes
+  ↓
+Commit changes to main
+  ↓
+Build locally (npm run build)
+  ↓
+Test build succeeds?
+  ├─ NO → Fix issues, rebuild
+  └─ YES → Ask user: "Ready to deploy?"
+            ↓
+            User says YES?
+              ├─ NO → Stop, wait for user
+              └─ YES → Run ./publish.sh
+```
+
+### When NOT to Deploy
+
+**Do NOT deploy in these situations**:
+- ❌ After every single commit
+- ❌ After fixing a bug (test first!)
+- ❌ When user says "test this"
+- ❌ When user says "let me check"
+- ❌ When build succeeds (user must approve!)
+- ❌ Automatically without asking
+
+**Only deploy when user explicitly says**:
+- ✅ "Deploy this"
+- ✅ "Push to production"
+- ✅ "Update the live site"
+- ✅ "Publish this"
 
 ## Troubleshooting Deployment Issues
 
@@ -191,11 +247,16 @@ When adding new votings, follow these steps:
    npm run dev
    ```
 
-4. **Commit and deploy**:
+4. **Commit changes**:
    ```bash
    git add .
    git commit -m "Add voting3"
    git push origin main
+   ```
+   
+5. **Deploy (only if user explicitly requests)**:
+   ```bash
+   # Ask user first: "Ready to deploy to production?"
    ./publish.sh
    ```
 
@@ -239,12 +300,13 @@ VSMeter/
 
 ## Important Notes for AI Agents
 
-1. **Never commit `dist/` to `main` branch** - It's gitignored for a reason
-2. **Always check `vite.config.js` base path** - Must be `/VSMeter/` exactly
-3. **Use `publish.sh` for deployment** - It's tested and reliable
-4. **Force push to `gh-pages` is safe** - It only contains build artifacts
-5. **Wait 1-2 minutes after deployment** - GitHub Pages needs time to propagate
-6. **Test locally first** - Run `npm run dev` before deploying
+1. **🚨 NEVER deploy without user approval** - Always test locally first and ask before deploying
+2. **Never commit `dist/` to `main` branch** - It's gitignored for a reason
+3. **Always check `vite.config.js` base path** - Must be `/VSMeter/` exactly
+4. **Use `publish.sh` for deployment** - It's tested and reliable
+5. **Force push to `gh-pages` is safe** - It only contains build artifacts
+6. **Wait 1-2 minutes after deployment** - GitHub Pages needs time to propagate
+7. **Test locally first** - Run `npm run build` and verify before deploying
 
 ## Quick Reference Commands
 
@@ -271,6 +333,7 @@ For issues with the deployment process or questions about this guide, refer to t
 
 ---
 
-**Last Updated**: 2026-02-11  
+**Last Updated**: 2026-02-12  
 **Maintainer**: SAPLAUM  
-**Deployment Method**: Manual script-based (publish.sh)
+**Deployment Method**: Manual script-based (publish.sh)  
+**Deployment Policy**: Test locally first, deploy only with explicit user approval
