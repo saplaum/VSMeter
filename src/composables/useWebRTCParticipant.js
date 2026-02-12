@@ -13,6 +13,11 @@ export function useWebRTCParticipant(roomId) {
   const voteCount = ref(0);
   const timeRemaining = ref(0);
   const timerActive = ref(false);
+  
+  // Reconnection logic
+  const reconnectAttempts = ref(0);
+  const maxReconnectAttempts = 20; // Try for ~2 minutes
+  const reconnectTimer = ref(null);
 
   const connect = () => {
     return new Promise((resolve, reject) => {
@@ -26,35 +31,7 @@ export function useWebRTCParticipant(roomId) {
         peer.value.on('open', (id) => {
           console.log('Participant peer opened with ID:', id);
           
-          // Connect to host
-          connection.value = peer.value.connect(roomId);
-
-          connection.value.on('open', () => {
-            console.log('Connected to host');
-            connectionStatus.value = CONNECTION_STATUS.CONNECTED;
-            
-            // Request current state
-            connection.value.send({
-              type: MESSAGE_TYPES.REQUEST_STATE,
-            });
-            
-            resolve(id);
-          });
-
-          connection.value.on('data', (data) => {
-            handleMessage(data);
-          });
-
-          connection.value.on('close', () => {
-            console.log('Connection to host closed');
-            connectionStatus.value = CONNECTION_STATUS.DISCONNECTED;
-          });
-
-          connection.value.on('error', (err) => {
-            console.error('Connection error:', err);
-            connectionStatus.value = CONNECTION_STATUS.ERROR;
-            reject(err);
-          });
+          attemptConnection(resolve, reject);
         });
 
         peer.value.on('error', (err) => {
@@ -67,6 +44,66 @@ export function useWebRTCParticipant(roomId) {
         reject(err);
       }
     });
+  };
+
+  const attemptConnection = (resolve, reject) => {
+    // Connect to host
+    connection.value = peer.value.connect(roomId);
+
+    const connectionTimeout = setTimeout(() => {
+      if (connectionStatus.value !== CONNECTION_STATUS.CONNECTED) {
+        console.log('Connection attempt timed out, retrying...');
+        scheduleReconnect(resolve, reject);
+      }
+    }, 5000); // 5 second timeout
+
+    connection.value.on('open', () => {
+      clearTimeout(connectionTimeout);
+      console.log('Connected to host');
+      connectionStatus.value = CONNECTION_STATUS.CONNECTED;
+      reconnectAttempts.value = 0; // Reset counter on success
+      
+      // Request current state
+      connection.value.send({
+        type: MESSAGE_TYPES.REQUEST_STATE,
+      });
+      
+      resolve(peer.value.id);
+    });
+
+    connection.value.on('data', (data) => {
+      handleMessage(data);
+    });
+
+    connection.value.on('close', () => {
+      console.log('Connection to host closed');
+      connectionStatus.value = CONNECTION_STATUS.DISCONNECTED;
+    });
+
+    connection.value.on('error', (err) => {
+      clearTimeout(connectionTimeout);
+      console.error('Connection error:', err);
+      scheduleReconnect(resolve, reject);
+    });
+  };
+
+  const scheduleReconnect = (resolve, reject) => {
+    if (reconnectAttempts.value >= maxReconnectAttempts) {
+      console.error('Max reconnection attempts reached');
+      connectionStatus.value = CONNECTION_STATUS.ERROR;
+      reject(new Error('Could not connect to host after multiple attempts'));
+      return;
+    }
+
+    reconnectAttempts.value++;
+    const delay = Math.min(1000 * Math.pow(1.5, reconnectAttempts.value), 10000); // Exponential backoff, max 10s
+    
+    console.log(`Reconnection attempt ${reconnectAttempts.value}/${maxReconnectAttempts} in ${Math.round(delay/1000)}s...`);
+    connectionStatus.value = CONNECTION_STATUS.CONNECTING;
+
+    reconnectTimer.value = setTimeout(() => {
+      attemptConnection(resolve, reject);
+    }, delay);
   };
 
   const handleMessage = (data) => {
@@ -124,6 +161,12 @@ export function useWebRTCParticipant(roomId) {
   };
 
   const destroy = () => {
+    // Clear reconnection timer
+    if (reconnectTimer.value) {
+      clearTimeout(reconnectTimer.value);
+      reconnectTimer.value = null;
+    }
+    
     if (connection.value) {
       connection.value.close();
       connection.value = null;
@@ -133,6 +176,7 @@ export function useWebRTCParticipant(roomId) {
       peer.value = null;
     }
     connectionStatus.value = CONNECTION_STATUS.DISCONNECTED;
+    reconnectAttempts.value = 0;
   };
 
   onUnmounted(() => {
@@ -149,6 +193,7 @@ export function useWebRTCParticipant(roomId) {
     voteCount,
     timeRemaining,
     timerActive,
+    reconnectAttempts,
     connect,
     vote,
     destroy,

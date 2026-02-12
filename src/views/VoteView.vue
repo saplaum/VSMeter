@@ -19,6 +19,9 @@
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-vs-bar-mid"></div>
         <p class="mt-4 text-vs-text-muted">Connecting...</p>
+        <p v-if="reconnectAttempts > 0" class="mt-2 text-sm text-vs-text-muted">
+          Reconnection attempt {{ reconnectAttempts }}/20...
+        </p>
       </div>
 
       <!-- Error State -->
@@ -146,6 +149,7 @@ const {
   voteCount,
   timeRemaining,
   timerActive,
+  reconnectAttempts,
   connect,
   vote,
 } = useWebRTCParticipant(fullRoomId);
