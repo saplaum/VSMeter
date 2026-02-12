@@ -15,21 +15,37 @@
         </div>
       </header>
 
-      <!-- Loading State -->
+      <!-- Loading/Connecting State -->
       <div v-if="loading || (connectionStatus === 'connecting' && !error)" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-vs-bar-mid"></div>
-        <p class="mt-4 text-vs-text-muted">Connecting...</p>
+        <p class="mt-4 text-lg text-vs-text-muted">
+          {{ reconnectAttempts > 0 ? 'Waiting for host to open the room...' : 'Connecting...' }}
+        </p>
         <p v-if="reconnectAttempts > 0" class="mt-2 text-sm text-vs-text-muted">
-          Reconnection attempt {{ reconnectAttempts }}/20...
+          Attempting to connect ({{ reconnectAttempts }}/20)
+        </p>
+        <p v-if="reconnectAttempts > 10" class="mt-4 text-sm text-amber-400">
+          Still waiting... Make sure the host has opened this room.
         </p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="card text-center py-8">
-        <p class="text-red-400 mb-4">{{ error }}</p>
-        <router-link to="/" class="btn-secondary">
-          Back to Home
-        </router-link>
+        <div class="mb-6">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-900/30 mb-4">
+            <span class="text-3xl">⏳</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Room Not Available</h3>
+          <p class="text-vs-text-muted mb-4">{{ error }}</p>
+        </div>
+        <div class="flex gap-3 justify-center">
+          <button @click="retryConnection" class="btn-primary">
+            Try Again
+          </button>
+          <router-link to="/" class="btn-secondary">
+            Back to Home
+          </router-link>
+        </div>
       </div>
 
       <!-- Voting Active -->
@@ -145,7 +161,7 @@ watch(connectionStatus, (newStatus) => {
     error.value = null;
     loading.value = false;
   } else if (newStatus === 'error' && reconnectAttempts.value >= 20) {
-    error.value = 'Could not connect to host after multiple attempts';
+    error.value = 'The host has not opened this room yet. Please check the room ID or try again later.';
     loading.value = false;
   }
 });
@@ -172,6 +188,16 @@ onMounted(async () => {
 
 const handleVote = (optionLabel) => {
   vote(optionLabel);
+};
+
+const retryConnection = () => {
+  error.value = null;
+  loading.value = true;
+  connect().catch(err => {
+    if (connectionStatus.value !== 'connecting') {
+      error.value = err.message || 'Connection failed';
+    }
+  });
 };
 
 // Watch for reset
