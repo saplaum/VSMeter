@@ -12,10 +12,6 @@
             :seconds="timeRemaining" 
             message="until results visible"
           />
-          <div v-else-if="!timerActive && !results && connectionStatus === 'connected'" class="flex items-center gap-2 text-vs-text-muted text-sm">
-            <Hourglass :size="16" :stroke-width="2" class="animate-pulse" />
-            <span>Waiting for voting to start...</span>
-          </div>
         </div>
       </header>
 
