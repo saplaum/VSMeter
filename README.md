@@ -19,14 +19,14 @@ A minimalist Mentimeter clone for anonymous live voting via WebRTC Peer-to-Peer.
 
 ## Demo
 
-**Live Demo:** `https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/`
+**Live Demo:** `https://saplaum.github.io/VSMeter/`
 
 ## Quick Start
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://git.i.mercedes-benz.com/SAPLAUM/VSMeter.git
+git clone https://github.com/saplaum/VSMeter.git
 cd VSMeter
 npm install
 ```
@@ -62,7 +62,14 @@ export default defineConfig({
 
 ## Deployment Without GitHub Actions
 
-### Option 1: Manual gh-pages Push
+### Option 1: Using Deployment Script
+
+```bash
+# Deploy to public GitHub Pages
+./publish-public.sh
+```
+
+### Option 2: Manual gh-pages Push
 
 ```bash
 # Build the project
@@ -76,7 +83,7 @@ git init
 git add -A
 git commit -m 'deploy'
 git branch -M gh-pages
-git remote add origin https://git.i.mercedes-benz.com/SAPLAUM/VSMeter.git
+git remote add origin https://github.com/YOUR-USERNAME/VSMeter.git
 git push -f origin gh-pages
 
 cd ..

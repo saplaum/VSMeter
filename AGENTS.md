@@ -8,7 +8,7 @@ This document provides instructions for AI agents (like OpenCode, Cursor, GitHub
 
 ### Deployment Targets
 
-**Internal (Mercedes-Benz GitHub Enterprise)**
+**Internal (Enterprise GitHub)**
 - **Repository**: `git@git.i.mercedes-benz.com:SAPLAUM/VSMeter.git`
 - **Live URL**: `https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/`
 - **Base Path**: `/SAPLAUM/VSMeter/`
@@ -46,7 +46,7 @@ Since GitHub Actions runners are not available in the internal environment, depl
 The project includes two deployment scripts for different targets:
 
 **1. Internal Deployment** (`publish-internal.sh`)
-- Deploys to Mercedes-Benz GitHub Enterprise
+- Deploys to Enterprise GitHub
 - Base path: `/SAPLAUM/VSMeter/`
 - URL: https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/
 
@@ -149,7 +149,7 @@ base: '/VSMeter/'  // GitHub.com
 
 Ensure GitHub Pages is configured to serve from `gh-pages` branch:
 
-**Internal (Mercedes-Benz):**
+**Internal (Enterprise GitHub):**
 1. Navigate to: `https://git.i.mercedes-benz.com/SAPLAUM/VSMeter/settings/pages`
 2. **Source**: `gh-pages` branch
 3. **Folder**: `/ (root)`
@@ -172,7 +172,7 @@ Deploy when:
 **Important**: Always commit source changes to `main` branch before deploying!
 
 **Deployment Target**: Choose which deployment target based on user needs:
-- Internal: Use `publish-internal.sh` for Mercedes-Benz access only
+- Internal: Use `publish-internal.sh` for enterprise access only
 - Public: Use `publish-public.sh` for public internet access
 - Both: Run both scripts to deploy to both targets
 
@@ -377,7 +377,7 @@ VSMeter/
 ├── public/votings/        # Voting configurations (Markdown)
 ├── src/                   # Source code
 ├── dist/                  # Build output (gitignored, deployed separately)
-├── publish-internal.sh    # Internal deployment script (MB GitHub)
+├── publish-internal.sh    # Internal deployment script (Enterprise GitHub)
 ├── publish-public.sh      # Public deployment script (GitHub.com)
 ├── vite.config.js         # Vite configuration (dual base path support)
 ├── package.json           # Dependencies and scripts
@@ -410,7 +410,7 @@ VITE_PUBLIC_BUILD=true npm run build  # Create public build
 npm run preview                    # Preview production build locally
 
 # Deployment
-./publish-internal.sh    # Build and deploy to internal MB GitHub
+./publish-internal.sh    # Build and deploy to internal Enterprise GitHub
 ./publish-public.sh      # Build and deploy to public GitHub.com
 
 # Git operations

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# VSMeter GitHub Pages Deployment Script
-# This script builds and deploys the app to gh-pages branch
+# VSMeter Internal GitHub Pages Deployment Script
+# This script builds and deploys the app to internal gh-pages branch
 
 set -e  # Exit on error
 
-echo "🚀 Starting VSMeter deployment..."
+echo "🚀 Starting VSMeter internal deployment..."
 
 # Build the project
 echo "📦 Building project..."
