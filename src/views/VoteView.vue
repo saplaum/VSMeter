@@ -33,7 +33,7 @@
       <div v-else-if="error" class="card text-center py-8">
         <div class="mb-6">
           <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-900/30 mb-4">
-            <span class="text-3xl">⏳</span>
+            <Hourglass :size="32" :stroke-width="2" class="text-red-400" />
           </div>
           <h3 class="text-xl font-semibold mb-2">Room Not Available</h3>
           <p class="text-vs-text-muted mb-4">{{ error }}</p>
