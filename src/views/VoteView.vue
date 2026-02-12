@@ -123,6 +123,33 @@ const config = ref(null);
 const loading = ref(true);
 const error = ref(null);
 
+// WebRTC Participant - use full room ID with votingId prefix
+const fullRoomId = `${props.votingId}-${props.roomId}`;
+
+const {
+  connectionStatus,
+  myVote,
+  results,
+  participantCount,
+  voteCount,
+  timeRemaining,
+  timerActive,
+  reconnectAttempts,
+  connect,
+  vote,
+} = useWebRTCParticipant(fullRoomId);
+
+// Watch connection status to clear errors when connected
+watch(connectionStatus, (newStatus) => {
+  if (newStatus === 'connected') {
+    error.value = null;
+    loading.value = false;
+  } else if (newStatus === 'error' && reconnectAttempts.value >= 20) {
+    error.value = 'Could not connect to host after multiple attempts';
+    loading.value = false;
+  }
+});
+
 // Load voting config
 onMounted(async () => {
   try {
@@ -142,33 +169,6 @@ onMounted(async () => {
     loading.value = false;
   }
 });
-
-// Watch connection status to clear errors when connected
-watch(connectionStatus, (newStatus) => {
-  if (newStatus === 'connected') {
-    error.value = null;
-    loading.value = false;
-  } else if (newStatus === 'error' && reconnectAttempts.value >= 20) {
-    error.value = 'Could not connect to host after multiple attempts';
-    loading.value = false;
-  }
-});
-
-// WebRTC Participant - use full room ID with votingId prefix
-const fullRoomId = `${props.votingId}-${props.roomId}`;
-
-const {
-  connectionStatus,
-  myVote,
-  results,
-  participantCount,
-  voteCount,
-  timeRemaining,
-  timerActive,
-  reconnectAttempts,
-  connect,
-  vote,
-} = useWebRTCParticipant(fullRoomId);
 
 const handleVote = (optionLabel) => {
   vote(optionLabel);
