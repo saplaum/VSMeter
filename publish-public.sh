@@ -17,6 +17,11 @@ npm run build
 # Navigate to dist folder
 cd dist
 
+# Replace __BASE_PATH__ placeholder in 404.html with public base path
+echo "🔧 Configuring 404.html for public deployment..."
+sed -i.bak 's|__BASE_PATH__|/VSMeter/|g' 404.html
+rm 404.html.bak
+
 # Initialize git if needed
 if [ ! -d .git ]; then
   echo "🔧 Initializing git in dist folder..."
