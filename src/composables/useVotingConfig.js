@@ -29,8 +29,8 @@ export function useVotingConfig() {
     
     try {
       // In production (GitHub Pages), we need to manually list the files
-      // For now, we'll hardcode voting1 and voting2
-      const votingIds = ['voting1', 'voting2'];
+      // For now, we'll hardcode voting1, voting2, and voting3
+      const votingIds = ['voting1', 'voting2', 'voting3'];
       const loadedVotings = [];
 
       for (const id of votingIds) {
