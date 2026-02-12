@@ -12,8 +12,9 @@
             :seconds="timeRemaining" 
             message="until results visible"
           />
-          <div v-else-if="!timerActive && !results && connectionStatus === 'connected'" class="text-vs-text-muted text-sm">
-            Waiting for voting to start...
+          <div v-else-if="!timerActive && !results && connectionStatus === 'connected'" class="flex items-center gap-2 text-vs-text-muted text-sm">
+            <Hourglass :size="16" :stroke-width="2" class="animate-pulse" />
+            <span>Waiting for voting to start...</span>
           </div>
         </div>
       </header>
@@ -50,9 +51,10 @@
           
           <!-- Waiting for host message -->
           <div v-if="!timerActive && connectionStatus === 'connected'" class="mt-6 text-center">
-            <p class="text-vs-text-muted text-lg">
-              ⏳ Waiting for host to start voting...
-            </p>
+            <div class="flex items-center justify-center gap-2 text-vs-text-muted text-lg">
+              <Hourglass :size="20" :stroke-width="2" class="animate-pulse" />
+              <span>Waiting for host to start voting...</span>
+            </div>
           </div>
         </div>
 
@@ -98,6 +100,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useVotingConfig } from '../composables/useVotingConfig';
 import { useWebRTCParticipant } from '../composables/useWebRTCParticipant';
+import { Hourglass } from 'lucide-vue-next';
 import ConnectionStatus from '../components/shared/ConnectionStatus.vue';
 import Timer from '../components/shared/Timer.vue';
 import VotingOption from '../components/vote/VotingOption.vue';

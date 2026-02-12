@@ -170,7 +170,9 @@
 
           <!-- Waiting State -->
           <div v-else class="card text-center py-12">
-            <div class="text-6xl mb-4">⏳</div>
+            <div class="flex justify-center mb-4">
+              <Hourglass :size="64" :stroke-width="1.5" class="text-vs-bar-accent animate-pulse" />
+            </div>
             <p class="text-xl text-vs-text-muted">
               Waiting for participants...
             </p>
@@ -190,6 +192,7 @@ import { useRouter } from 'vue-router';
 import { useVotingConfig } from '../composables/useVotingConfig';
 import { useWebRTCHost } from '../composables/useWebRTCHost';
 import { useTimer } from '../composables/useTimer';
+import { Hourglass } from 'lucide-vue-next';
 import ConnectionStatus from '../components/shared/ConnectionStatus.vue';
 import ShareLink from '../components/shared/ShareLink.vue';
 import Timer from '../components/shared/Timer.vue';
