@@ -16,7 +16,7 @@
       </header>
 
       <!-- Loading State -->
-      <div v-if="loading" class="text-center py-12">
+      <div v-if="loading || (connectionStatus === 'connecting' && !error)" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-vs-bar-mid"></div>
         <p class="mt-4 text-vs-text-muted">Connecting...</p>
         <p v-if="reconnectAttempts > 0" class="mt-2 text-sm text-vs-text-muted">
@@ -128,12 +128,28 @@ onMounted(async () => {
   try {
     config.value = await loadVoting(props.votingId);
     
-    // Connect to host
-    await connect();
+    // Start connection (don't await - it will retry in background)
+    connect().catch(err => {
+      // Only show error if we're not still trying to connect
+      if (connectionStatus.value !== 'connecting') {
+        error.value = err.message || 'Fehler beim Verbinden';
+      }
+    });
     
     loading.value = false;
   } catch (err) {
-    error.value = err.message || 'Fehler beim Verbinden';
+    error.value = err.message || 'Fehler beim Laden des Votings';
+    loading.value = false;
+  }
+});
+
+// Watch connection status to clear errors when connected
+watch(connectionStatus, (newStatus) => {
+  if (newStatus === 'connected') {
+    error.value = null;
+    loading.value = false;
+  } else if (newStatus === 'error' && reconnectAttempts.value >= 20) {
+    error.value = 'Could not connect to host after multiple attempts';
     loading.value = false;
   }
 });
