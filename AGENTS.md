@@ -4,55 +4,81 @@ This document provides instructions for AI agents (like OpenCode, Cursor, GitHub
 
 ## Project Overview
 
-**VSMeter** is a Mentimeter clone for anonymous live voting using WebRTC P2P technology. It's a Vue 3 + Vite application deployed to GitHub Pages without GitHub Actions runners.
+**VSMeter** is a Mentimeter clone for anonymous live voting using WebRTC P2P technology. It's a Vue 3 + Vite application deployed to GitHub Pages (both internal and public).
 
+### Deployment Targets
+
+**Internal (Mercedes-Benz GitHub Enterprise)**
 - **Repository**: `git@git.i.mercedes-benz.com:SAPLAUM/VSMeter.git`
 - **Live URL**: `https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/`
-- **Base Path**: `/VSMeter/` (case-sensitive!)
+- **Base Path**: `/SAPLAUM/VSMeter/`
+- **Script**: `publish-internal.sh`
+
+**Public (GitHub.com)**
+- **Repository**: `git@github.com:saplaum/VSMeter.git`
+- **Live URL**: `https://saplaum.github.io/VSMeter/`
+- **Base Path**: `/VSMeter/`
+- **Script**: `publish-public.sh`
 
 ## Deployment Architecture
 
 ### Manual Deployment (No GitHub Actions)
 
-Since GitHub Actions runners are not available in this environment, deployment uses a **manual script-based approach**:
+Since GitHub Actions runners are not available in the internal environment, deployment uses a **manual script-based approach**:
 
 1. Source code lives on `main` branch
 2. Built assets are pushed to `gh-pages` branch
 3. GitHub Pages serves from `gh-pages` branch root
+4. Two separate remotes and scripts for dual deployment
 
 ### Why This Approach?
 
-- No GitHub Actions runners available
+- No GitHub Actions runners available (internal)
 - Simple and reliable
 - Full control over deployment timing
+- Support for both internal and public hosting
 - No CI/CD configuration needed
 
 ## Deployment Process
 
-### Automated Deployment Script
+### Automated Deployment Scripts
 
-The project includes `publish.sh` which automates the entire deployment process.
+The project includes two deployment scripts for different targets:
 
-**Script Location**: `/publish.sh` (project root)
+**1. Internal Deployment** (`publish-internal.sh`)
+- Deploys to Mercedes-Benz GitHub Enterprise
+- Base path: `/SAPLAUM/VSMeter/`
+- URL: https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/
 
-**What it does**:
-1. Runs `npm run build` to create production bundle
-2. Navigates to `dist/` folder
-3. Initializes git repository in dist (if first time)
-4. Stages all built files
-5. Creates commit with timestamp
-6. Force-pushes to `gh-pages` branch
-7. Returns to project root
+**2. Public Deployment** (`publish-public.sh`)
+- Deploys to public GitHub.com
+- Base path: `/VSMeter/`
+- URL: https://saplaum.github.io/VSMeter/
+- Sets `VITE_PUBLIC_BUILD=true` environment variable
+
+**What both scripts do**:
+1. Run `npm run build` to create production bundle (with correct base path)
+2. Navigate to `dist/` folder
+3. Initialize git repository in dist (if first time)
+4. Stage all built files
+5. Create commit with timestamp
+6. Force-push to `gh-pages` branch of respective remote
+7. Return to project root
 
 **Usage**:
 ```bash
-./publish.sh
+# Internal deployment
+./publish-internal.sh
+
+# Public deployment  
+./publish-public.sh
 ```
 
 ### Manual Deployment (Without Script)
 
 If you need to deploy manually without the script:
 
+**Internal:**
 ```bash
 # 1. Build the project
 npm run build
@@ -76,18 +102,46 @@ git push -f origin gh-pages
 cd ..
 ```
 
+**Public:**
+```bash
+# 1. Build the project for public
+export VITE_PUBLIC_BUILD=true
+npm run build
+
+# 2. Navigate to dist folder
+cd dist
+
+# 3. Initialize git (first time only)
+git init
+git branch -M gh-pages
+git remote add origin git@github.com:saplaum/VSMeter.git
+
+# 4. Stage and commit
+git add -A
+git commit -m "deploy"
+
+# 5. Push to gh-pages
+git push -f origin gh-pages
+
+# 6. Return to root
+cd ..
+```
+
 ## Critical Configuration
 
 ### vite.config.js
 
-The `base` path **must match the repository name** (case-sensitive):
+The `base` path is **automatically determined** based on the `VITE_PUBLIC_BUILD` environment variable:
 
 ```javascript
-export default defineConfig({
-  base: '/VSMeter/',  // Must be uppercase 'VSMeter'
-  // ...
-})
+// Internal build (default):
+base: '/SAPLAUM/VSMeter/'  // MB GitHub Enterprise
+
+// Public build (VITE_PUBLIC_BUILD=true):
+base: '/VSMeter/'  // GitHub.com
 ```
+
+**The deployment scripts handle this automatically!**
 
 **Common Issue**: GitHub Pages paths are case-sensitive. If the base path doesn't match the repo name exactly, assets will 404.
 
@@ -95,9 +149,16 @@ export default defineConfig({
 
 Ensure GitHub Pages is configured to serve from `gh-pages` branch:
 
+**Internal (Mercedes-Benz):**
 1. Navigate to: `https://git.i.mercedes-benz.com/SAPLAUM/VSMeter/settings/pages`
 2. **Source**: `gh-pages` branch
 3. **Folder**: `/ (root)`
+
+**Public (GitHub.com):**
+1. Create repository first: `https://github.com/saplaum/VSMeter`
+2. Navigate to Settings > Pages
+3. **Source**: `gh-pages` branch
+4. **Folder**: `/ (root)`
 
 ## When to Deploy
 
@@ -109,6 +170,11 @@ Deploy when:
 - Votings are added/modified
 
 **Important**: Always commit source changes to `main` branch before deploying!
+
+**Deployment Target**: Choose which deployment target based on user needs:
+- Internal: Use `publish-internal.sh` for Mercedes-Benz access only
+- Public: Use `publish-public.sh` for public internet access
+- Both: Run both scripts to deploy to both targets
 
 ## Deployment Workflow for AI Agents
 
@@ -140,14 +206,18 @@ git commit -m "Your descriptive commit message"
 git push origin main
 
 # 2. ASK USER: "Ready to deploy to production?"
+# ASK USER: "Deploy to internal, public, or both?"
 # WAIT for confirmation!
 
 # 3. Only after user confirms, run the deployment script
-./publish.sh
+./publish-internal.sh   # For internal MB GitHub
+./publish-public.sh     # For public GitHub.com
+# Or both if requested
 
 # 4. Verify deployment
 # Wait 1-2 minutes, then check:
-# https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/
+# Internal: https://git.i.mercedes-benz.com/pages/SAPLAUM/VSMeter/
+# Public: https://saplaum.github.io/VSMeter/
 ```
 
 ### Deployment Decision Tree
@@ -163,9 +233,11 @@ Test build succeeds?
   ├─ NO → Fix issues, rebuild
   └─ YES → Ask user: "Ready to deploy?"
             ↓
+            Ask user: "Deploy to internal, public, or both?"
+            ↓
             User says YES?
               ├─ NO → Stop, wait for user
-              └─ YES → Run ./publish.sh
+              └─ YES → Run ./publish-internal.sh and/or ./publish-public.sh
 ```
 
 ### When NOT to Deploy
@@ -190,7 +262,10 @@ Test build succeeds?
 
 **Symptom**: Page loads but CSS/JS files return 404  
 **Cause**: Base path mismatch in `vite.config.js`  
-**Fix**: Ensure `base: '/VSMeter/'` matches repo name exactly (case-sensitive)
+**Fix**: 
+- For public: Ensure `base: '/VSMeter/'` matches repo name exactly (case-sensitive)
+- For internal: Ensure `base: '/SAPLAUM/VSMeter/'` matches repo structure
+- Verify correct `VITE_PUBLIC_BUILD` environment variable was set during build
 
 ### Old Version Still Showing
 
@@ -257,7 +332,9 @@ When adding new votings, follow these steps:
 5. **Deploy (only if user explicitly requests)**:
    ```bash
    # Ask user first: "Ready to deploy to production?"
-   ./publish.sh
+   # Ask user: "Deploy to internal, public, or both?"
+   ./publish-internal.sh    # For internal
+   ./publish-public.sh      # For public
    ```
 
 ## Development vs Production
@@ -272,6 +349,14 @@ npm run dev
 
 ### Production Build
 ```bash
+# Internal build (default)
+npm run build
+# Generates dist/ folder
+# Base path is '/SAPLAUM/VSMeter/'
+# Minified and optimized
+
+# Public build
+export VITE_PUBLIC_BUILD=true
 npm run build
 # Generates dist/ folder
 # Base path is '/VSMeter/'
@@ -292,21 +377,26 @@ VSMeter/
 ├── public/votings/        # Voting configurations (Markdown)
 ├── src/                   # Source code
 ├── dist/                  # Build output (gitignored, deployed separately)
-├── publish.sh             # Deployment script
-├── vite.config.js         # Vite configuration (contains base path)
+├── publish-internal.sh    # Internal deployment script (MB GitHub)
+├── publish-public.sh      # Public deployment script (GitHub.com)
+├── vite.config.js         # Vite configuration (dual base path support)
 ├── package.json           # Dependencies and scripts
-└── README.md              # User documentation
+├── README.md              # User documentation (internal)
+├── README-PUBLIC.md       # Public-facing documentation
+└── AGENTS.md              # AI agent deployment guide
 ```
 
 ## Important Notes for AI Agents
 
 1. **🚨 NEVER deploy without user approval** - Always test locally first and ask before deploying
-2. **Never commit `dist/` to `main` branch** - It's gitignored for a reason
-3. **Always check `vite.config.js` base path** - Must be `/VSMeter/` exactly
-4. **Use `publish.sh` for deployment** - It's tested and reliable
-5. **Force push to `gh-pages` is safe** - It only contains build artifacts
-6. **Wait 1-2 minutes after deployment** - GitHub Pages needs time to propagate
-7. **Test locally first** - Run `npm run build` and verify before deploying
+2. **Always ask which target** - "Deploy to internal, public, or both?"
+3. **Never commit `dist/` to `main` branch** - It's gitignored for a reason
+4. **Base path varies by target** - Internal: `/SAPLAUM/VSMeter/`, Public: `/VSMeter/`
+5. **Use correct deployment script** - `publish-internal.sh` or `publish-public.sh`
+6. **Force push to `gh-pages` is safe** - It only contains build artifacts
+7. **Wait 1-2 minutes after deployment** - GitHub Pages needs time to propagate
+8. **Test locally first** - Run `npm run build` and verify before deploying
+9. **Environment variable matters** - Public builds require `VITE_PUBLIC_BUILD=true`
 
 ## Quick Reference Commands
 
@@ -315,16 +405,19 @@ VSMeter/
 npm run dev              # Start dev server
 
 # Building
-npm run build            # Create production build
-npm run preview          # Preview production build locally
+npm run build                      # Create internal build (default)
+VITE_PUBLIC_BUILD=true npm run build  # Create public build
+npm run preview                    # Preview production build locally
 
 # Deployment
-./publish.sh             # Build and deploy to GitHub Pages
+./publish-internal.sh    # Build and deploy to internal MB GitHub
+./publish-public.sh      # Build and deploy to public GitHub.com
 
 # Git operations
 git add .
 git commit -m "message"
-git push origin main     # Push source to main branch
+git push origin main     # Push source to internal repo
+git push public main     # Push source to public repo (optional)
 ```
 
 ## Contact & Support
@@ -335,5 +428,6 @@ For issues with the deployment process or questions about this guide, refer to t
 
 **Last Updated**: 2026-02-12  
 **Maintainer**: SAPLAUM  
-**Deployment Method**: Manual script-based (publish.sh)  
+**Deployment Method**: Manual script-based (dual-deployment)  
+**Deployment Scripts**: `publish-internal.sh`, `publish-public.sh`  
 **Deployment Policy**: Test locally first, deploy only with explicit user approval
