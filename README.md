@@ -272,10 +272,11 @@ WebRTC messages exchanged between host and participants:
 
 ## Current Votings
 
-Two PI Planning votings are configured:
+Three PI Planning votings are configured:
 
-1. **Voting 1**: Overall PI success rating (5-point scale with face emojis)
-2. **Voting 2**: PI experience satisfaction (5-point scale with face emojis)
+1. **Voting 1**: Overall PI success rating (5-point scale: 😠 to 😄)
+2. **Voting 2**: PI experience satisfaction (5-point scale: 😠 to 😄)
+3. **Voting 3**: Confidence in achieving upcoming PI plans (5-point scale: 😰 to 😎)
 
 ## Contributing
 
